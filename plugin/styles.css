@@ -1,0 +1,31 @@
+.vault-sync-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vault-sync-status .sync-icon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.vault-sync-status .sync-icon.connected {
+  background-color: var(--text-success);
+}
+
+.vault-sync-status .sync-icon.syncing {
+  background-color: var(--text-warning);
+  animation: pulse 1s infinite;
+}
+
+.vault-sync-status .sync-icon.error,
+.vault-sync-status .sync-icon.disconnected {
+  background-color: var(--text-error);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
