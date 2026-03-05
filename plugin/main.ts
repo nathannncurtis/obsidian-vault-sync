@@ -262,7 +262,7 @@ export default class VaultSyncPlugin extends Plugin {
 
 			// compute local hashes
 			for (const [path, file] of localMap) {
-				const content = await this.app.vault.readBinary(file.path);
+				const content = await this.app.vault.readBinary(file);
 				const hash = await computeHash(content);
 				this.localHashes.set(path, hash);
 			}
@@ -279,7 +279,7 @@ export default class VaultSyncPlugin extends Plugin {
 					if (content) {
 						this.suppressNextLocal.add(path);
 						await this.ensureFolder(path);
-						await this.app.vault.createBinary(path, content);
+						await this.app.vault.createBinary(path, content as ArrayBuffer);
 						this.localHashes.set(path, info.hash);
 					}
 				} else if (localHash !== info.hash) {
@@ -294,7 +294,7 @@ export default class VaultSyncPlugin extends Plugin {
 						}
 					} else {
 						// local is newer, upload
-						const content = await this.app.vault.readBinary(localFile.path);
+						const content = await this.app.vault.readBinary(localFile);
 						const form = new FormData();
 						form.append("path", path);
 						form.append("content", new Blob([content]));
@@ -311,7 +311,7 @@ export default class VaultSyncPlugin extends Plugin {
 			// sync local → remote (files not on server)
 			for (const [path, file] of localMap) {
 				if (!remoteMap.has(path)) {
-					const content = await this.app.vault.readBinary(file.path);
+					const content = await this.app.vault.readBinary(file);
 					const form = new FormData();
 					form.append("path", path);
 					form.append("content", new Blob([content]));
@@ -354,11 +354,10 @@ export default class VaultSyncPlugin extends Plugin {
 					this.localHashes.delete(file.path);
 					this.remoteFiles.delete(file.path);
 				} else {
-					const content = await this.app.vault.readBinary(file.path);
+					const tfile = file as TFile;
+					const content = await this.app.vault.readBinary(tfile);
 					const hash = await computeHash(content);
 					if (hash === this.localHashes.get(file.path)) return;
-
-					const tfile = file as TFile;
 					const form = new FormData();
 					form.append("path", file.path);
 					form.append("content", new Blob([content]));
